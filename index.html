@@ -57,6 +57,7 @@
             width: calc(50% - 17px);
             box-sizing: border-box;
             position: relative;
+            color: var(--primary-color);
         }
 
         .title-input {
@@ -80,7 +81,7 @@
             border: 1.7px solid var(--border-color);
         }
 
-        td, th, input, .total-sum {
+        td, th, input, .total-sum, .dc {
             width: 68px;
             height: 68px;
             text-align: center;
@@ -97,7 +98,7 @@
             box-shadow: inset 0 1.7px 3.4px rgba(0, 0, 0, 0.5);
         }
 
-        .total-sum {
+        .total-sum, .dc {
             color: var(--bg-color);
             background-color: #c0c0c0;
             box-shadow: 0 1.7px 3.4px rgba(0, 0, 0, 0.5);
@@ -170,7 +171,7 @@
             border-color: #fff;
         }
 
-        .high-contrast td, .high-contrast th, .high-contrast input, .high-contrast .total-sum {
+        .high-contrast td, .high-contrast th, .high-contrast input, .high-contrast .total-sum, .high-contrast .dc {
             border-color: #fff;
             background-color: #444;
             color: #fff;
@@ -190,7 +191,7 @@
             color: #000;
         }
 
-        .high-contrast .total-sum {
+        .high-contrast .total-sum, .high-contrast .dc {
             background-color: #777;
             color: #fff;
         }
@@ -215,7 +216,7 @@
             border-color: #3498db;
         }
 
-        .blue-gray td, .blue-gray th, .blue-gray input, .blue-gray .total-sum {
+        .blue-gray td, .blue-gray th, .blue-gray input, .blue-gray .total-sum, .blue-gray .dc {
             border-color: #3498db;
             background-color: #5d6d7e;
             color: #ecf0f1;
@@ -235,7 +236,7 @@
             color: #ecf0f1;
         }
 
-        .blue-gray .total-sum {
+        .blue-gray .total-sum, .blue-gray .dc {
             background-color: #1abc9c;
             color: #ecf0f1;
         }
@@ -252,7 +253,7 @@
             white-space: pre-wrap;
             display: none;
             z-index: 10;
-            font-size: 13px;
+            font-size: 34px; /* Increased font size to be twice as large */
         }
 
         .container:hover .tooltip {
@@ -270,6 +271,25 @@
             box-sizing: border-box;
             resize: none;
             white-space: pre-wrap;
+        }
+
+        .labels {
+            display: flex;
+            justify-content: space-around;
+            color: var(--primary-color);
+        }
+
+        .labels div {
+            width: 68px;
+            text-align: center;
+        }
+
+        .high-contrast .labels {
+            color: #fff;
+        }
+
+        .blue-gray .labels {
+            color: #ecf0f1;
         }
     </style>
 </head>
@@ -331,8 +351,14 @@
                     <table>
                         <tbody class="grid">
                             <tr>
-                                ${instanceData.grid.map(value => `<td><input type="number" min="0" max="99" value="${value}" oninput="calculateSums(this)" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)"></td>`).join('')}
-                                <td class="total-sum">${instanceData.totalSum}</td>
+                                ${instanceData.grid.slice(0, 6).map((value, index) => `<td${index === 0 ? ' style="padding: 0;"' : ''}><div>${['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'][index]}</div><input type="number" min="0" max="99" value="${value}" oninput="calculateSums(this)" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)"></td>`).join('')}
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <tbody class="grid">
+                            <tr>
+                                ${instanceData.grid.slice(6, 8).map((value, index) => `<td><div>${index === 0 ? 'AC' : 'DC'}</div><input type="number" min="0" max="99" value="${value}" oninput="calculateSums(this)" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)"></td>`).join('')}
                             </tr>
                         </tbody>
                     </table>
@@ -351,8 +377,7 @@
         function createNewInstanceData() {
             return {
                 title: "Stat Block Generator",
-                grid: Array(6).fill(0),
-                totalSum: 0,
+                grid: Array(8).fill(0),
                 theme: "",
                 note: ""
             };
@@ -369,14 +394,8 @@
         function calculateSums(input) {
             const container = input.closest('.container');
             const inputs = container.querySelectorAll('.grid input');
-            let totalSum = 0;
-            inputs.forEach(input => {
-                totalSum += parseInt(input.value) || 0;
-            });
-            container.querySelector('.total-sum').textContent = totalSum;
             const index = Array.from(document.querySelectorAll('.container')).indexOf(container);
             currentInstances[index].grid = Array.from(inputs).map(input => parseInt(input.value) || 0);
-            currentInstances[index].totalSum = totalSum;
         }
 
         function resetGrid(button) {
@@ -427,7 +446,9 @@
                 results.push(rolls.slice(1).reduce((sum, roll) => sum + roll, 0));
             }
             inputs.forEach((input, index) => {
-                input.value = results[index];
+                if (index < 6) {
+                    input.value = results[index];
+                }
             });
             calculateSums(inputs[0]);
         }
