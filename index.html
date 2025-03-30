@@ -364,7 +364,7 @@
                         <option value="7">White</option>
                     </select>
                     <button onclick="resetGrid(this)">Reset</button>
-                    <textarea class="note-input" placeholder="Enter note" oninput="updateNote(this)">${instanceData.note}</textarea>
+                    <textarea class="note-input" placeholder="Notes:" oninput="updateNote(this)">${instanceData.note}</textarea>
                     <div class="tooltip">${instanceData.note}</div>
                 `;
                 instancesContainer.appendChild(container);
