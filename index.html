@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +74,7 @@
             border: none;
             border-bottom: 1.7px solid var(--primary-color);
             border-radius: var(--border-radius);
-            padding: var(--padding);
+            padding: var (--padding);
             font-size: 25.5px;
             margin-bottom: 12.75px;
             text-align: center;
@@ -343,7 +344,11 @@
                     <table>
                         <tbody class="grid">
                             <tr>
-                                ${instanceData.grid.slice(6, 8).map((value, index) => `<td><div>${index === 0 ? 'AC' : 'DC'}</div><input type="number" min="0" max="99" value="${value}" oninput="calculateSums(this)"></td>`).join('')}
+                                ${instanceData.grid.slice(6, 12).map((value, index) => `
+                                    <td>
+                                        <input type="text" placeholder="${['AC', 'DC', 'PP', 'Misc.', 'Misc.', 'Misc.'][index]}">
+                                        <input type="number" min="0" max="99" value="${value}" oninput="calculateSums(this)">
+                                    </td>`).join('')}
                             </tr>
                         </tbody>
                     </table>
@@ -371,7 +376,7 @@
         function createNewInstanceData() {
             return {
                 title: "Name:",
-                grid: Array(8).fill(0),
+                grid: Array(12).fill(0),
                 themeIndex: 0,
                 theme: themes[0],
                 note: ""
